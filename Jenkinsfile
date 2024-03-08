@@ -1,8 +1,5 @@
 pipeline {
-    agent {
-        // Run on a build agent where we have the Android SDK installed
-        label 'android'
-    }
+    agent any
     environment {
         // Fastlane Environment Variables
         PATH = "$HOME/.fastlane/bin:" +
