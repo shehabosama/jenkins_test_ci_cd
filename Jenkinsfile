@@ -1,5 +1,10 @@
 pipeline {
     agent any
+     tools {
+            // Specify the Git tool installation
+            git 'GIT'
+        }
+
     stages {
         stage('Build App') {
             steps {
