@@ -2,7 +2,7 @@ pipeline {
     agent any
  tools {
         // Specify the JDK tool installation by name and version
-        jdk 'jdk17'
+        jdk 'JAVA_HOME'
     }
     stages {
         stage('Checkout') {
