@@ -9,7 +9,7 @@ pipeline {
         stage('Build App') {
             steps {
                 // Clean and assemble APKs
-                bat 'start /B gradlew.bat clean assembleDebug assembleDebug'
+                sh 'start /B gradlew.bat clean assembleDebug assembleDebug'
 
             }
         }
