@@ -12,14 +12,14 @@ pipeline {
         stage('Build') {
             steps {
                 // Build the Android project
-                sh './gradlew assembleDebug'
+                bat 'gradlew.bat assembleDebug'
             }
         }
 
         stage('Run Tests') {
             steps {
                 // Run unit tests for the Android project
-                sh './gradlew test'
+                bat 'gradlew.bat test'
             }
         }
 
