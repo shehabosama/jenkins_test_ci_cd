@@ -1,4 +1,4 @@
-package com.example.jenkins_test_ci_cd
+package com.jenkins_test.jenkins_test_ci_cd
 
 import org.junit.Test
 

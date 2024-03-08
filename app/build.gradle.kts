@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.jenkins_test_ci_cd"
+    namespace = "com.jenkins_test.jenkins_test_ci_cd"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.jenkins_test_ci_cd"
+        applicationId = "com.jenkins_test.jenkins_test_ci_cd"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
