@@ -14,10 +14,10 @@ pipeline {
                 // Use Gradle to build the APK
                 script {
                     // For Unix-based systems (Linux, macOS)
-                    sh './gradlew clean assembleDebug'
+                    //sh './gradlew clean assembleDebug'
 
                     // For Windows
-                    // bat 'gradlew.bat clean assembleDebug'
+                     bat 'gradlew.bat clean assembleDebug'
                 }
             }
         }
