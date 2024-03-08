@@ -25,105 +25,105 @@ pipeline {
         skipStagesAfterUnstable()
     }
     stages {
-        stage('Start Build') {
-            steps {
-                bitbucketStatusNotify(buildState: 'INPROGRESS')
-            }
-        }
-        stage('Copy Key Stores') {
-            steps {
-                script {
-                    def projName = PROJECT_NAME.replaceAll(" ", "_").toLowerCase()
-                    sh "cp ~/Documents/android-keystores/${projName}_release.jks ../"
-                    sh "cp ~/Documents/android-keystores/${projName}_upload.jks ../"
-                    sh "cp ~/Documents/android-keystores/debug.ks ../"
-                }
-            }
-        }
-        stage('Copy Local Properties') {
-            steps {
-                script {
-                    def projName = PROJECT_NAME.replaceAll(" ", "_").toLowerCase()
-                    sh "cp ~/Documents/${projName}/local.properties ."
-                }
-            }
-        }
-        stage('Setup Versions') {
-            steps {
-                script {
-                    VERSION_NAME = sh(
-                            script: './gradlew -q printVersionName',
-                            returnStdout: true
-                    ).trim().tokenize().last()
-
-                    VERSION_SUFFIX = sh(
-                            script: './gradlew -q printVersionSuffix',
-                            returnStdout: true
-                    ).trim().tokenize().last()
-
-                    APP_VERSION_NAME = VERSION_NAME + VERSION_SUFFIX
-
-                    VERSION_CODE = sh(
-                            script: './gradlew -q printVersionCode',
-                            returnStdout: true
-                    ).trim().tokenize().last()
-
-                    JIRA_PROJECT_KEY = sh(
-                            script: './gradlew -q printJiraProjectKey',
-                            returnStdout: true
-                    ).trim().tokenize().last()
-
-                    DROPBOX_FOLDER = "${PROJECT_NAME}/${VERSION_NAME}/${APP_VERSION_NAME}"
-
-                    PROGUARD_ENABLED = sh(
-                            script: './gradlew -q printProguardEnabled',
-                            returnStdout: true
-                    ).trim().tokenize().last()
-                }
-            }
-        }
+//         stage('Start Build') {
+//             steps {
+//                 bitbucketStatusNotify(buildState: 'INPROGRESS')
+//             }
+//         }
+//         stage('Copy Key Stores') {
+//             steps {
+//                 script {
+//                     def projName = PROJECT_NAME.replaceAll(" ", "_").toLowerCase()
+//                     sh "cp ~/Documents/android-keystores/${projName}_release.jks ../"
+//                     sh "cp ~/Documents/android-keystores/${projName}_upload.jks ../"
+//                     sh "cp ~/Documents/android-keystores/debug.ks ../"
+//                 }
+//             }
+//         }
+//         stage('Copy Local Properties') {
+//             steps {
+//                 script {
+//                     def projName = PROJECT_NAME.replaceAll(" ", "_").toLowerCase()
+//                     sh "cp ~/Documents/${projName}/local.properties ."
+//                 }
+//             }
+//         }
+//         stage('Setup Versions') {
+//             steps {
+//                 script {
+//                     VERSION_NAME = sh(
+//                             script: './gradlew -q printVersionName',
+//                             returnStdout: true
+//                     ).trim().tokenize().last()
+//
+//                     VERSION_SUFFIX = sh(
+//                             script: './gradlew -q printVersionSuffix',
+//                             returnStdout: true
+//                     ).trim().tokenize().last()
+//
+//                     APP_VERSION_NAME = VERSION_NAME + VERSION_SUFFIX
+//
+//                     VERSION_CODE = sh(
+//                             script: './gradlew -q printVersionCode',
+//                             returnStdout: true
+//                     ).trim().tokenize().last()
+//
+//                     JIRA_PROJECT_KEY = sh(
+//                             script: './gradlew -q printJiraProjectKey',
+//                             returnStdout: true
+//                     ).trim().tokenize().last()
+//
+//                     DROPBOX_FOLDER = "${PROJECT_NAME}/${VERSION_NAME}/${APP_VERSION_NAME}"
+//
+//                     PROGUARD_ENABLED = sh(
+//                             script: './gradlew -q printProguardEnabled',
+//                             returnStdout: true
+//                     ).trim().tokenize().last()
+//                 }
+//             }
+//         }
         stage('Build App') {
             steps {
                 // Clean and assemble APKs
-                sh './gradlew clean assembleDebug assembleRelease'
+                sh './gradlew clean assembleDebug assembleDebug'
 
-                script {
-                    if (env.BRANCH_NAME.startsWith("release")) {
-                        sh './gradlew bundleUpload'
-                    }
-                }
+//                 script {
+//                     if (env.BRANCH_NAME.startsWith("release")) {
+//                         sh './gradlew bundleUpload'
+//                     }
+//                 }
             }
         }
-        stage('Upload To Google Play Store') {
-            steps {
-                script {
-                    if (env.BRANCH_NAME.startsWith("release")) {
-                        // This Gradle task comes from the Publisher script:
-                        sh './gradlew generateReleaseMessage uploadToPlayStore tagUploadBuildCommit'
-
-                        def repo = scm.getUserRemoteConfigs()[0].getUrl().replaceAll("https://", "")
-
-                        withCredentials([usernamePassword(credentialsId: 'Android', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                            def user = URLEncoder.encode(GIT_USERNAME, "UTF-8")
-                            def pass = URLEncoder.encode(GIT_PASSWORD, "UTF-8")
-                            repo = "https://${user}:${pass}@${repo}"
-
-                            try {
-                                sh("""
-                                   set +x
-                                   git push ${repo} --tags
-                                   set -x
-                                   """.stripMargin().stripIndent())
-                            } catch (Exception e) {
-                                echo e.printStackTrace()
-                            }
-                        }
-                    } else {
-                        echo 'Skipping \'Upload To Google Play Store\' stage since we\'re not on a release branch...'
-                    }
-                }
-            }
-        }
+//         stage('Upload To Google Play Store') {
+//             steps {
+//                 script {
+//                     if (env.BRANCH_NAME.startsWith("release")) {
+//                         // This Gradle task comes from the Publisher script:
+//                         sh './gradlew generateReleaseMessage uploadToPlayStore tagUploadBuildCommit'
+//
+//                         def repo = scm.getUserRemoteConfigs()[0].getUrl().replaceAll("https://", "")
+//
+//                         withCredentials([usernamePassword(credentialsId: 'Android', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+//                             def user = URLEncoder.encode(GIT_USERNAME, "UTF-8")
+//                             def pass = URLEncoder.encode(GIT_PASSWORD, "UTF-8")
+//                             repo = "https://${user}:${pass}@${repo}"
+//
+//                             try {
+//                                 sh("""
+//                                    set +x
+//                                    git push ${repo} --tags
+//                                    set -x
+//                                    """.stripMargin().stripIndent())
+//                             } catch (Exception e) {
+//                                 echo e.printStackTrace()
+//                             }
+//                         }
+//                     } else {
+//                         echo 'Skipping \'Upload To Google Play Store\' stage since we\'re not on a release branch...'
+//                     }
+//                 }
+//             }
+//         }
         stage('Archive Files') {
             steps {
                 // Archive the APKs so that they can be downloaded from Jenkins
@@ -131,37 +131,37 @@ pipeline {
                 archiveArtifacts '**/*.apk'
 
                 script {
-                    if (PROGUARD_ENABLED == "true") {
-                        echo 'Archiving Mappings...'
-                        archiveArtifacts '**/mapping.txt'
-                    }
-
-                    if (env.BRANCH_NAME.startsWith("release")) {
-                        echo 'Archiving AABs...'
-                        archiveArtifacts '**/*.aab'
-                    }
+//                     if (PROGUARD_ENABLED == "true") {
+//                         echo 'Archiving Mappings...'
+//                         archiveArtifacts '**/mapping.txt'
+//                     }
+//
+//                     if (env.BRANCH_NAME.startsWith("release")) {
+//                         echo 'Archiving AABs...'
+//                         archiveArtifacts '**/*.aab'
+//                     }
                 }
             }
         }
-        stage('Upload to Dropbox') {
-            steps {
-                script {
-                    if (env.BRANCH_NAME.startsWith("release")) {
-                        dropbox configName: 'Dropbox Android', remoteDirectory: "${DROPBOX_FOLDER}", sourceFiles: '**/*.apk', flatten: true
-                    } else {
-                        echo 'Skipping \'Upload to Dropbox\' stage since we\'re not on a release branch...'
-                    }
-                }
-            }
-        }
-        stage('Static Analysis') {
-            steps {
-                echo 'Static Analysis'
-                // Run Lint and analyse the results
-                sh './gradlew lintProductionRelease'
-                androidLint()
-            }
-        }
+//         stage('Upload to Dropbox') {
+//             steps {
+//                 script {
+//                     if (env.BRANCH_NAME.startsWith("release")) {
+//                         dropbox configName: 'Dropbox Android', remoteDirectory: "${DROPBOX_FOLDER}", sourceFiles: '**/*.apk', flatten: true
+//                     } else {
+//                         echo 'Skipping \'Upload to Dropbox\' stage since we\'re not on a release branch...'
+//                     }
+//                 }
+//             }
+//         }
+//         stage('Static Analysis') {
+//             steps {
+//                 echo 'Static Analysis'
+//                 // Run Lint and analyse the results
+//                 sh './gradlew lintProductionRelease'
+//                 androidLint()
+//             }
+//         }
         stage('Finished') {
             steps {
                 echo 'Finished'
